@@ -58,3 +58,4 @@ This example contains a HTTP function ready for Azure.
 [Related guide section...](https://quarkus.io/guides/azure-functions-http)
 
 > :warning: **INCOMPATIBLE WITH NATIVE**: Azure Functions Integration is not compatible with native yet!
+# Test
