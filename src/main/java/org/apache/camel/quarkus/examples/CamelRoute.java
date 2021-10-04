@@ -20,6 +20,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.model.rest.RestBindingMode;
 
 @ApplicationScoped
 public class CamelRoute extends RouteBuilder {
@@ -29,9 +30,17 @@ public class CamelRoute extends RouteBuilder {
 
     @Override
     public void configure() {
-        from("direct:input").routeId("Test")
-                .log("Inside Camel Route Received Payload ==> ${body}")
-                .setBody().body(Person.class, p -> greetService.greet(p.getName()))
-                .end();
+
+        restConfiguration().bindingMode(RestBindingMode.json);
+
+        rest("/greet")
+            .post()
+            .consumes("application/json")
+            .produces("text/plain")
+            .type(Person.class)
+            .route().routeId("azure_functions_test")
+            .log("Inside Camel Route Received Payload ==> ${body}")
+            .setBody().body(Person.class, p -> greetService.greet(p.getName()))
+        .endRest();
     }
 }

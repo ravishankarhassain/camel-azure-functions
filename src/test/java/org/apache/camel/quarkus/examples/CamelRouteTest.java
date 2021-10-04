@@ -18,21 +18,38 @@ package org.apache.camel.quarkus.examples;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.RestAssured;
+import io.restassured.parsing.Parser;
+
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.Matchers.equalTo;
+import static io.restassured.RestAssured.given;
+
+import static org.hamcrest.CoreMatchers.containsString;
 
 @QuarkusTest
-public class GreetingTest
+public class CamelRouteTest
 {
-    // NOTE: RestAssured is aware of the application.properties quarkus.http.root-path switch
+    private static String requestBody = "{\"name\" : \"Ravishankar\"}";
+    private static String responseBody = "Hello Ravishankar ! How are you? from GreetService";
 
-    @Test
-    public void testJaxrs() {
-        RestAssured.when().get("/hello").then()
-                .statusCode(200)
-                .contentType("text/plain")
-                .body(equalTo("hello jaxrs"));
+    @BeforeAll
+    public static void setup() {
+        RestAssured.registerParser("text/plain", Parser.TEXT);
     }
 
+    @Test
+    public void testGreetPost() {
+        
+        given()
+            .body(requestBody)
+            .header("Content-Type", "application/json")
+            .header("Accept", "text/plain")
+            .when().post("/greet")
+            .then()
+            .assertThat()
+            .statusCode(200)
+            .body(containsString(responseBody));
+
+    }
 }
